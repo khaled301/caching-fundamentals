@@ -6,41 +6,50 @@ import config
 
 class MysqlGateway:
     def __init__(self):
-        try: 
-            db_con = mysql.connector.connect(
+        self.connection = None
+        self.cursor = None
+        self.connect()
+
+    def connect(self):
+        try:
+            self.connection = mysql.connector.connect(
                 host=config.mysql_host,
                 user=config.mysql_user,
                 password=config.mysql_password,
-                database=config.mysql_database,
+                database=config.mysql_database
             )
-            
+
             """_summary_
                 Creates a cursor that will execute the SQL statement
                 The dictionary = True value, instructs Python to return the SQL result as key-value pairs (dictionary). 
                 The dictionary format allows us to format the response to JSON format when displaying the data.
             """
-            self.db_cursor = db_con.cursor(dictionary=True)
-            
+            self.cursor = self.connection.cursor(dictionary=True)
         except Exception as e:
-            print(e)
-            self.db_cursor = None
-            
-    def db_cursor_close(self):
-        if self.db_cursor:
-            self.db_cursor.close()
-            self.db_cursor = None
+            print(f"Error connecting to MySQL: {e}")
+            self.connection = None
+            self.cursor = None
 
     def query_mysql(self, query_string):
-        if self.db_cursor:
+        if self.connection is None or not self.connection.is_connected():
+            self.connect()
+            
+        if self.connection and self.connection.is_connected() and self.cursor:
             try:
                 # Execute the SQL statement against the query
-                self.db_cursor.execute(query_string)
+                self.cursor.execute(query_string)
                 
                 # Fetch and return the results
-                return self.db_cursor.fetchall()
+                return self.cursor.fetchall()
             except Exception as e:
-                print(e)
+                print(f"Error executing query: {e}")
                 return None
         else:
-            print(f"Invalid db_cursor: {self.db_cursor}")
+            print(f"Connection to MySQL failed: {self.cursor}")
             return None
+
+    def close_connection(self):
+        if self.cursor:
+            self.cursor.close()
+        if self.connection:
+            self.connection.close()
