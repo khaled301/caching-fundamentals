@@ -35,3 +35,8 @@
 ### To avoid race condition we can save the processed message id in a separate redis db and check against it before process it and also add expiry to the data
 
 ### Another enhancement is using Dead Letter Queue. Basically we will store them somewhere else if a message fails to process by the worker to avoid data loss, but remember we wont process them either from the DLQ.
+
+
+### Important Resources:
+    - https://redis.io/blog/beyond-the-cache-with-python/
+    - 
