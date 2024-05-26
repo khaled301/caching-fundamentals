@@ -1,3 +1,5 @@
+# in production this setup will be different. For instance we won't be providing password directly over here 
+
 services:
   redis:
     image: redis:latest
