@@ -21,6 +21,12 @@ Install the redis library.
 ### to run redis and redis-cli using docker compose
 > docker compose run redis redis-cli -h redis -a <your_secret> -n 0
 
+## To run the Docker container on the background
+> docker compose up -d
+
+## to get the Redis version running in the container
+> docker-compose exec redis redis-server --version
+
 ### Get into MySQL DB
 
 > mysql -u<MySQL_USER> -p<MySQL_PASS>
