@@ -1,0 +1,14 @@
+{
+  "name": "redis-pubsub",
+  "version": "1.0.0",
+  "description": "There are two NodeJs Express applications linked to two different database, for convenience let's call the first application A and the second B, both are linked to the same redis instance with Ioredis.",
+  "main": "application-a.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "ioredis": "^5.4.1"
+  }
+}

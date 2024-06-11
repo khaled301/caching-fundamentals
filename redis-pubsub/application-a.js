@@ -1,14 +1,15 @@
 // import necessary modules as per your need
 const Redis = require('ioredis');
-const redisAppA = new Redis();
+const redisAppASub = new Redis();
+const redisAppAPub = new Redis();
 
 async function appA(){
 
-    await redisAppA.subscribe("send-company", (err, count) => {
+    await redisAppASub.subscribe("send-company", (err, count) => {
         if (err) console.error(err?.message);
     });
 
-    redisAppA.on("message", async (channel, message) => {
+    redisAppASub.on("message", async (channel, message) => {
         if (channel === "send-company") {
             console.log(message);
 
@@ -23,14 +24,14 @@ async function appA(){
 
     async function requestDataFromAppB(){
         return new Promise((resolve, reject) => {
-            redisAppA.publish("get-company", "requestDBData", (err) => {
+            redisAppAPub.publish("get-company", "requestDBData", (err) => {
                 if (err) return reject(err);
 
                 console.log("request sent to Application B");
             });
 
             // Temporary subscription to listen and resolve the response
-            redisAppA.on("message", (channel, message) => {
+            redisAppASub.once("message", (channel, message) => {
                 if (channel == "send-company"){
                     resolve(message)
                 }
@@ -39,8 +40,9 @@ async function appA(){
     }
 
     // call the requestDataFromAppB and get the response
-    const response = await requestDataFromAppB();                       
+    const response = await requestDataFromAppB();        
+    console.log(response, " <<--------- response received from Application B");               
 }
 
 // call as per your need
-appA()
+appA().catch(err => console.error(`Application A error: ${err?.message}`));

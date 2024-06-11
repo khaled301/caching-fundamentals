@@ -1,17 +1,21 @@
 // import necessary modules as per your need
 const Redis = require('ioredis');
-const redisAppB = new Redis();
+const redisAppBSub = new Redis();
+const redisAppBPub = new Redis();
 
 async function appB(){
-    await redisAppB.subscribe("get-company", (err, count) => {
+    console.log("Application B is starting...");
+
+    await redisAppBSub.subscribe("get-company", (err, count) => {
         if (err) console.error(err?.message);
     });
 
-    redisAppB.on("message", async (channel, message) => {
+    redisAppBSub.on("message", async (channel, message) => {
         if (channel == "get-company" && message == "requestDBData"){
         const dbData = await fetchDataFromDatabase();
-        
-        redisAppB.publish("send-company", dbData, (err) => {
+        console.log(dbData, ` <<----- dbData`);
+
+        redisAppBPub.publish("send-company", dbData, (err) => {
             if (err) console.log(err?.message)
             console.log("response sent to Application A")
         });
@@ -19,9 +23,16 @@ async function appB(){
     });
 
     async function fetchDataFromDatabase() {
-        // your logic here
+        // Your data fetching logic here
+
+        // Simulate fetching data with a delay using a Promise
+        return new Promise((resolve) => {
+            setTimeout(() => {
+                resolve(JSON.stringify({data: "data from database"}));
+            }, 5000);
+        });
     }
 }
 
 // call as per your need
-appB();
+appB().catch(err => console.error(`Application B error: ${err?.message}`));
